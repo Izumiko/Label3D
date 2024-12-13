@@ -16,8 +16,7 @@ function obj = Empty( varargin )
 %   >> uix.Empty( 'Parent', box )
 %   >> uicontrol( 'Parent', box, 'Background', 'b' )
 
-%   Copyright 2009-2016 The MathWorks, Inc.
-%   $Revision: 1436 $ $Date: 2016-11-17 17:53:29 +0000 (Thu, 17 Nov 2016) $
+%  Copyright 2009-2020 The MathWorks, Inc.
 
 % Create uicontainer
 obj = matlab.ui.container.internal.UIContainer( 'Tag', 'empty', varargin{:} );
@@ -60,14 +59,12 @@ end % onParentColorChanged
 function name = getColorProperty( obj )
 %getColorProperty  Get color property
 
-names = {'Color','BackgroundColor'}; % possible names
-for ii = 1:numel( names ) % loop over possible names
-    name = names{ii};
-    if isprop( obj, name )
-        return
-    end
-end
-error( 'Cannot find color property for %s.', class( obj ) )
+name = '';
+if isprop( obj, 'Color' )
+    name = 'Color';
+elseif isprop( obj, 'BackgroundColor' )
+    name = 'BackgroundColor';
+end % if
 
 end % getColorProperty
 
@@ -77,11 +74,9 @@ function updateColor( obj )
 parent = obj.Parent;
 if isempty( parent ), return, end
 property = getColorProperty( parent );
-color = parent.( property );
-try
+if ~isempty( property )
+    color = parent.( property );
     obj.BackgroundColor = color;
-catch e
-    warning( e.identifier, e.message ) % rethrow as warning
 end
 
 end % updateColor

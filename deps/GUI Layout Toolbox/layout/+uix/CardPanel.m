@@ -9,8 +9,7 @@ classdef CardPanel < uix.Container & uix.mixin.Panel
     %
     %  See also: uix.Panel, uix.BoxPanel, uix.TabPanel, uicontainer
     
-    %  Copyright 2009-2016 The MathWorks, Inc.
-    %  $Revision: 1436 $ $Date: 2016-11-17 17:53:29 +0000 (Thu, 17 Nov 2016) $
+    %  Copyright 2009-2020 The MathWorks, Inc.
     
     methods
         
@@ -23,15 +22,11 @@ classdef CardPanel < uix.Container & uix.mixin.Panel
             %  value v1, etc.
             
             % Set properties
-            if nargin > 0
-                try
-                    assert( rem( nargin, 2 ) == 0, 'uix:InvalidArgument', ...
-                        'Parameters and values must be provided in pairs.' )
-                    set( obj, varargin{:} )
-                catch e
-                    delete( obj )
-                    e.throwAsCaller()
-                end
+            try
+                uix.set( obj, varargin{:} )
+            catch e
+                delete( obj )
+                e.throwAsCaller()
             end
             
         end % constructor

@@ -9,8 +9,7 @@ classdef HBoxFlex < uix.HBox & uix.mixin.Flex
     %
     %  See also: uix.VBoxFlex, uix.GridFlex, uix.HBox, uix.HButtonBox
     
-    %  Copyright 2009-2016 The MathWorks, Inc.
-    %  $Revision: 1436 $ $Date: 2016-11-17 17:53:29 +0000 (Thu, 17 Nov 2016) $
+    %  Copyright 2009-2020 The MathWorks, Inc.
     
     properties( Access = public, Dependent, AbortSet )
         DividerMarkings % divider markings [on|off]
@@ -48,22 +47,21 @@ classdef HBoxFlex < uix.HBox & uix.mixin.Flex
             % Create listeners
             backgroundColorListener = event.proplistener( obj, ...
                 findprop( obj, 'BackgroundColor' ), 'PostSet', ...
-                @obj.onBackgroundColorChange );
+                @obj.onBackgroundColorChanged );
             
             % Store properties
             obj.FrontDivider = frontDivider;
             obj.BackgroundColorListener = backgroundColorListener;
             
+            % Set Spacing property (may be overwritten by uix.set)
+            obj.Spacing = 5;
+            
             % Set properties
-            if nargin > 0
-                try
-                    assert( rem( nargin, 2 ) == 0, 'uix:InvalidArgument', ...
-                        'Parameters and values must be provided in pairs.' )
-                    set( obj, varargin{:} )
-                catch e
-                    delete( obj )
-                    e.throwAsCaller()
-                end
+            try
+                uix.set( obj, varargin{:} )
+            catch e
+                delete( obj )
+                e.throwAsCaller()
             end
             
         end % constructor
@@ -81,7 +79,9 @@ classdef HBoxFlex < uix.HBox & uix.mixin.Flex
         function set.DividerMarkings( obj, value )
             
             % Check
-            assert( ischar( value ) && any( strcmp( value, {'on','off'} ) ), ...
+            value = uix.validateScalarStringOrCharacterArray( value, ...
+                'DividerMarkings' );
+            assert( any( strcmp( value, {'on','off'} ) ), ...
                 'uix:InvalidArgument', ...
                 'Property ''DividerMarkings'' must be ''on'' or ''off'.' )
             
@@ -138,7 +138,9 @@ classdef HBoxFlex < uix.HBox & uix.mixin.Flex
                 jc = loc + 1;
                 divider = obj.ColumnDividers(loc);
                 contents = obj.Contents_;
-                oldPixelWidths = [contents(ic).Position(3); contents(jc).Position(3)];
+                ip = uix.getPosition( contents(ic), 'pixels' );
+                jp = uix.getPosition( contents(jc), 'pixels' );
+                oldPixelWidths = [ip(3); jp(3)];
                 minimumWidths = obj.MinimumWidths_(iw:jw,:);
                 if delta < 0 % limit to minimum distance from left neighbor
                     delta = max( delta, minimumWidths(1) - oldPixelWidths(1) );
@@ -191,7 +193,9 @@ classdef HBoxFlex < uix.HBox & uix.mixin.Flex
                 ic = loc;
                 jc = loc + 1;
                 contents = obj.Contents_;
-                oldPixelWidths = [contents(ic).Position(3); contents(jc).Position(3)];
+                ip = uix.getPosition( contents(ic), 'pixels' );
+                jp = uix.getPosition( contents(jc), 'pixels' );
+                oldPixelWidths = [ip(3); jp(3)];
                 minimumWidths = obj.MinimumWidths_(iw:jw,:);
                 if delta < 0 % limit to minimum distance from left neighbor
                     delta = max( delta, minimumWidths(1) - oldPixelWidths(1) );
@@ -204,8 +208,8 @@ classdef HBoxFlex < uix.HBox & uix.mixin.Flex
             
         end % onMouseMotion
         
-        function onBackgroundColorChange( obj, ~, ~ )
-            %onBackgroundColorChange  Handler for BackgroundColor changes
+        function onBackgroundColorChanged( obj, ~, ~ )
+            %onBackgroundColorChanged  Handler for BackgroundColor changes
             
             backgroundColor = obj.BackgroundColor;
             highlightColor = min( [backgroundColor / 0.75; 1 1 1] );
@@ -220,7 +224,7 @@ classdef HBoxFlex < uix.HBox & uix.mixin.Flex
             frontDivider = obj.FrontDivider;
             frontDivider.BackgroundColor = shadowColor;
             
-        end % onBackgroundColorChange
+        end % onBackgroundColorChanged
         
     end % event handlers
     

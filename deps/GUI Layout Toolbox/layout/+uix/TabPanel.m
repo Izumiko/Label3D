@@ -13,8 +13,7 @@ classdef TabPanel < uix.Container & uix.mixin.Panel
     %
     %  See also: uitabgroup, uitab, uix.CardPanel
     
-    %  Copyright 2009-2016 The MathWorks, Inc.
-    %  $Revision: 1436 $ $Date: 2016-11-17 17:53:29 +0000 (Thu, 17 Nov 2016) $
+    %  Copyright 2009-2024 The MathWorks, Inc.
     
     properties( Access = public, Dependent, AbortSet )
         FontAngle % font angle
@@ -87,7 +86,7 @@ classdef TabPanel < uix.Container & uix.mixin.Panel
             % Create listeners
             backgroundColorListener = event.proplistener( obj, ...
                 findprop( obj, 'BackgroundColor' ), 'PostSet', ...
-                @obj.onBackgroundColorChange );
+                @obj.onBackgroundColorChanged );
             selectionChangedListener = event.listener( obj, ...
                 'SelectionChanged', @obj.onSelectionChanged );
             parentListener = event.proplistener( obj, ...
@@ -101,15 +100,11 @@ classdef TabPanel < uix.Container & uix.mixin.Panel
             obj.ParentListener = parentListener;
             
             % Set properties
-            if nargin > 0
-                try
-                    assert( rem( nargin, 2 ) == 0, 'uix:InvalidArgument', ...
-                        'Parameters and values must be provided in pairs.' )
-                    set( obj, varargin{:} )
-                catch e
-                    delete( obj )
-                    e.throwAsCaller()
-                end
+            try
+                uix.set( obj, varargin{:} )
+            catch e
+                delete( obj )
+                e.throwAsCaller()
             end
             
         end % constructor
@@ -833,12 +828,12 @@ classdef TabPanel < uix.Container & uix.mixin.Panel
             
         end % onTabClicked
         
-        function onBackgroundColorChange( obj, ~, ~ )
+        function onBackgroundColorChanged( obj, ~, ~ )
             
             % Mark as dirty
             obj.Dirty = true;
             
-        end % onBackgroundColorChange
+        end % onBackgroundColorChanged
         
         function onSelectionChanged( obj, source, eventData )
             

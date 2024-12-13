@@ -1,4 +1,4 @@
-classdef Divider < matlab.mixin.SetGet
+classdef ( Hidden ) Divider < matlab.mixin.SetGet
     %uix.Divider  Draggable divider
     %
     %  d = uix.Divider() creates a divider.
@@ -6,8 +6,7 @@ classdef Divider < matlab.mixin.SetGet
     %  d = uix.Divider(p1,v1,p2,v2,...) creates a divider and sets
     %  specified property p1 to value v1, etc.
     
-    %  Copyright 2009-2016 The MathWorks, Inc.
-    %  $Revision: 1436 $ $Date: 2016-11-17 17:53:29 +0000 (Thu, 17 Nov 2016) $
+    %  Copyright 2009-2024 The MathWorks, Inc.
     
     properties( Dependent )
         Parent % parent
@@ -51,15 +50,11 @@ classdef Divider < matlab.mixin.SetGet
             obj.Control = control;
             
             % Set properties
-            if nargin > 0
-                try
-                    assert( rem( nargin, 2 ) == 0, 'uix:InvalidArgument', ...
-                        'Parameters and values must be provided in pairs.' )
-                    set( obj, varargin{:} )
-                catch e
-                    delete( obj )
-                    e.throwAsCaller()
-                end
+            try
+                uix.set( obj, varargin{:} )
+            catch e
+                delete( obj )
+                e.throwAsCaller()
             end
             
             % Force update
@@ -256,8 +251,15 @@ classdef Divider < matlab.mixin.SetGet
             %  tf = d.isMouseOver(wmd) tests whether the WindowMouseData
             %  wmd is consistent with the mouse pointer being over the
             %  divider d.
+            %
+            %  This method returns false for dividers that are being
+            %  deleted.
             
-            tf = reshape( [obj.Control] == eventData.HitObject, size( obj ) );
+            tf = isvalid( obj ); % initialize
+            for ii = 1:numel( obj )
+                tf(ii) = tf(ii) && ~isempty( eventData.HitObject ) && ...
+                    obj(ii).Control == eventData.HitObject;
+            end
             
         end % isMouseOver
         

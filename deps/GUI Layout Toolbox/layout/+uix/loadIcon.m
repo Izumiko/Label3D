@@ -14,8 +14,7 @@ function cdata = loadIcon( filename, bgcol )
 %
 %   See also: imread
 
-%  Copyright 2009-2016 The MathWorks, Inc.
-%  $Revision: 1436 $ $Date: 2016-11-17 17:53:29 +0000 (Thu, 17 Nov 2016) $
+%  Copyright 2009-2020 The MathWorks, Inc.
 
 % Check inputs
 narginchk( 1, 2 )
@@ -83,17 +82,11 @@ function cdata = convertToDouble( cdata )
 
 switch lower( class( cdata ) )
     case 'double'
-        % do nothing
-    case 'single'
-        cdata = double( cdata );
+        % do nothing    
     case 'uint8'
         cdata = double( cdata ) / 255;
     case 'uint16'
-        cdata = double( cdata ) / 65535;
-    case 'int8'
-        cdata = ( double( cdata ) + 128 ) / 255;
-    case 'int16'
-        cdata = ( double( cdata ) + 32768 ) / 65535;
+        cdata = double( cdata ) / 65535;    
     otherwise
         error( 'uix:InvalidArgument', ...
             'Image data of type ''%s'' is not supported.', class( cdata ) )
